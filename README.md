@@ -18,7 +18,8 @@ git clone https://github.com/apetkovi1/TnP_LowPtElectrons.git
 ```
 * Cretate TnP pairs:
 ```
-root -q -b CreateTnPpairs.cpp "()"
+root -q -b CreateTnPpairsData.cpp "()"
+root -q -b CreateTnPpairsMC.cpp "()"
 ```
 * Perform fits and get the efficiencies (figures will be stored in plots directory). Bins and CMS part (Barrel or Endcap) can be selected inside TnPAnalyzer.cpp
 ```
