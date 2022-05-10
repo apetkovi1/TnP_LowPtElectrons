@@ -10,6 +10,7 @@ cd CMSSW_10_2_10/src
 cmsenv
 mkdir TnP_fits
 cd TnP_fits
+mkdir plots
 ```
 * Get the TnP tool:
 ```
