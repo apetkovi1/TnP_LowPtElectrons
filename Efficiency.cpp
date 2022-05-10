@@ -9,7 +9,7 @@ void Efficiency(std::vector<std::pair<float,float>> YieldErrorDATAPass, std::vec
   TH1F* hist_fail_MC = new TH1F("hist fail MC", "hist fail MC",NumberOfBins, bins);
   TH1F* hist_total_data = new TH1F("hist total data", "hist total data",NumberOfBins, bins);
   TH1F* hist_total_MC = new TH1F("hist total MC", "hist total MC",NumberOfBins, bins);
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < NumberOfBins; i++)
    {
        hist_pass_data->SetBinContent(i+1, YieldErrorDATAPass.at(i).first);
        hist_pass_data->SetBinError(i+1,YieldErrorDATAPass.at(i).second);
