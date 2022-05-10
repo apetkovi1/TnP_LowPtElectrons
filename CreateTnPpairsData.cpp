@@ -2,7 +2,7 @@
 #include "TChain.h"
 #include "TFile.h"
 
-void CreateTnPpairs()
+void CreateTnPpairsData()
 {
   float TagPt,ProbePt,Diele_mass,TagEta,ProbeEta;
   bool ProbePass;
