@@ -12,7 +12,7 @@ void TnPAnalyzer()
   int i;
   std::vector<std::pair<float,float>> YieldErrorDataPass, YieldErrorDataFail, YieldErrorMCPass, YieldErrorMCFail;
   float bins[]={7,9,11,13,15};  //this part is configurable, select bins for fitting
-  bool FitBarrel=1, FitEndcap=0; //this part is configurable, fit for barrel or endcap
+  bool FitBarrel=0, FitEndcap=1; //this part is configurable, fit for barrel or endcap
   int NumberOfBins=sizeof(bins)/sizeof(bins[0])-1;
   TString BarrelCut="ProbeEta>-1.45 && ProbeEta<1.45";
   TString EndcapCut="((ProbeEta>-2.5 && ProbeEta<-1.45) || (ProbeEta>1.45 && ProbeEta<2.5))";
@@ -54,6 +54,7 @@ void TnPAnalyzer()
   }
 
   if(FitEndcap)
+  for(i=0;i<NumberOfBins;i++)
   {
      PassingProbesData[i] = tree_data->CopyTree(TString::Format("ProbePt>%f && ProbePt<%f && ProbePass==1 && " + EndcapCut,bins[i],bins[i+1]));
      FaillingProbesData[i] = tree_data->CopyTree(TString::Format("ProbePt>%f && ProbePt<%f && ProbePass==0 && " + EndcapCut,bins[i],bins[i+1]));

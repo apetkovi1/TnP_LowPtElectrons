@@ -28,8 +28,6 @@ void Efficiency(std::vector<std::pair<float,float>> YieldErrorDATAPass, std::vec
    hist_total_MC->Add(hist_pass_MC);
    hist_total_MC->Add(hist_fail_MC);
 
-   std::cout<<hist_total_data->GetBinContent(2)<<std::endl;
-
    TEfficiency* Eff_data= new TEfficiency(*hist_pass_data,*hist_total_data);
    TEfficiency* Eff_MC= new TEfficiency(*hist_pass_MC,*hist_total_MC);
 
