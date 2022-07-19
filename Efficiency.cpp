@@ -1,37 +1,24 @@
 
-void Efficiency(std::vector<std::pair<float,float>> YieldErrorDATAPass, std::vector<std::pair<float,float>> YieldErrorDataFail,
-                std::vector<std::pair<float,float>> YieldErrorMCPass, std::vector<std::pair<float,float>> YieldErrorMCFail, float bins[], int NumberOfBins)
+TEfficiency* Efficiency(std::vector<std::pair<float,float>> YieldErrorPass, std::vector<std::pair<float,float>> YieldErrorFail, float bins[], int NumberOfBins)
 {
 
-  TH1F* hist_pass_data = new TH1F("hist pass data", "hist pass data",NumberOfBins, bins);
-  TH1F* hist_fail_data = new TH1F("hist fail data", "hist fail data",NumberOfBins, bins);
-  TH1F* hist_pass_MC = new TH1F("hist pass MC", "hist pass MC",NumberOfBins, bins);
-  TH1F* hist_fail_MC = new TH1F("hist fail MC", "hist fail MC",NumberOfBins, bins);
-  TH1F* hist_total_data = new TH1F("hist total data", "hist total data",NumberOfBins, bins);
-  TH1F* hist_total_MC = new TH1F("hist total MC", "hist total MC",NumberOfBins, bins);
+  TH1F* hist_pass = new TH1F("hist pass", "hist pass",NumberOfBins, bins);
+  TH1F* hist_fail = new TH1F("hist fail", "hist fail",NumberOfBins, bins);
+  TH1F* hist_total = new TH1F("hist total", "hist total",NumberOfBins, bins);
   for (int i = 0; i < NumberOfBins; i++)
    {
-       hist_pass_data->SetBinContent(i+1, YieldErrorDATAPass.at(i).first);
-       hist_pass_data->SetBinError(i+1,YieldErrorDATAPass.at(i).second);
-       hist_fail_data->SetBinContent(i+1,YieldErrorDataFail.at(i).first);
-       hist_fail_data->SetBinError(i+1,YieldErrorDataFail.at(i).second);
-
-       hist_pass_MC->SetBinContent(i+1,YieldErrorMCPass.at(i).first);
-       hist_pass_MC->SetBinError(i+1,YieldErrorMCPass.at(i).second);
-       hist_fail_MC->SetBinContent(i+1,YieldErrorMCFail.at(i).first);
-       hist_fail_MC->SetBinError(i+1,YieldErrorMCFail.at(i).second);
+       hist_pass->SetBinContent(i+1, YieldErrorPass.at(i).first);
+       hist_pass->SetBinError(i+1,YieldErrorPass.at(i).second);
+       hist_fail->SetBinContent(i+1,YieldErrorFail.at(i).first);
+       hist_fail->SetBinError(i+1,YieldErrorFail.at(i).second);
    }
 
-   hist_total_data->Add(hist_pass_data);
-   hist_total_data->Add(hist_fail_data);
+   hist_total->Add(hist_pass);
+   hist_total->Add(hist_fail);
 
-   hist_total_MC->Add(hist_pass_MC);
-   hist_total_MC->Add(hist_fail_MC);
+   TEfficiency* Eff= new TEfficiency(*hist_pass,*hist_total);
 
-   TEfficiency* Eff_data= new TEfficiency(*hist_pass_data,*hist_total_data);
-   TEfficiency* Eff_MC= new TEfficiency(*hist_pass_MC,*hist_total_MC);
-
-  Eff_data->SetLineColor(kBlue);
+  /*Eff_data->SetLineColor(kBlue);
   Eff_MC->SetLineColor(kRed);
   auto legend = new TLegend(0.9,0.9,1.0,1.0);
   auto mg  = new TMultiGraph();
@@ -51,5 +38,7 @@ void Efficiency(std::vector<std::pair<float,float>> YieldErrorDATAPass, std::vec
   mg->GetXaxis()->SetTitle("pT/GeV");
   mg->GetYaxis()->SetTitle("Efficiency");
   legend->Draw();
-  oi->SaveAs("plots/Efficiency.pdf");
+  oi->SaveAs("plots/Efficiency.pdf");*/
+
+   return Eff;
 }
