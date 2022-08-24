@@ -6,13 +6,14 @@
 #include "MakeFitData.cpp"
 #include "MakeFitMC.cpp"
 #include "Efficiency.cpp"
+#include <cmath>
 
 void TnPAnalyzer()
 {
   int i;
   std::vector<std::pair<float,float>> YieldErrorDataPass, YieldErrorDataFail, YieldErrorMCPass, YieldErrorMCFail;
   float bins[]={5,7,10,15};  //this part is configurable, select bins for fitting
-  bool FitInnerBarrel=1, FitOuterBarrel=0, FitEndcap=0; //this part is configurable, fit for barrel or endcap
+  bool FitInnerBarrel=0, FitOuterBarrel=0, FitEndcap=1; //this part is configurable, fit for barrel or endcap
   int NumberOfBins=sizeof(bins)/sizeof(bins[0])-1;
   TString InnerBarrelCut="fabs(ProbeEta)<0.8";
   //TString InnerBarrelCut="fabs(ProbeEta)>1 && fabs(ProbeEta)<1.5";
@@ -80,10 +81,6 @@ void TnPAnalyzer()
     YieldErrorMCFail.push_back(MakeFitMC(FaillingProbesMC[i], 1, "plots/FaillingProbesMC_"+std::to_string((int)bins[i])+"_"+std::to_string((int)bins[i+1])+".pdf"));
   }
 
-  //Efficiency(YieldErrorDataPass,YieldErrorDataFail,YieldErrorMCPass, YieldErrorMCFail, bins, NumberOfBins);
-
-  //std::cout<<Efficiency(YieldErrorMCPass, YieldErrorMCFail, bins, NumberOfBins)->GetEfficiency(2)<<std::endl;
-
   TEfficiency* Eff_MC = Efficiency(YieldErrorMCPass, YieldErrorMCFail, bins, NumberOfBins);
   TEfficiency* Eff_DATA = Efficiency(YieldErrorDataPass, YieldErrorDataFail, bins, NumberOfBins);
   for(i=1;i<=3;i++)
@@ -96,6 +93,23 @@ void TnPAnalyzer()
   }
   std::cout<<YieldErrorMCPass.at(0).first<<" "<<YieldErrorMCPass.at(0).second<<std::endl;
   std::cout<<YieldErrorMCFail.at(0).first<<" "<<YieldErrorMCFail.at(0).second<<std::endl;
+
+  //scale factors
+  TH1F* SF = new TH1F("scale factor", "scale factor",NumberOfBins, bins);
+  for(i=1;i<=NumberOfBins;i++)
+  {
+    SF->SetBinContent(i,Eff_DATA->GetEfficiency(i)*1.0/Eff_MC->GetEfficiency(i));
+    double SF_error=sqrt(pow(Eff_MC->GetEfficiency(i)*Eff_DATA->GetEfficiencyErrorUp(i),2)+pow(Eff_DATA->GetEfficiency(i)*Eff_MC->GetEfficiencyErrorUp(i),2))/pow(Eff_MC->GetEfficiency(i),2);
+    SF->SetBinError(i, SF_error);
+  }
+  SF->GetXaxis()->SetTitle("pT/GeV");
+  SF->GetYaxis()->SetTitle("SF");
+  TCanvas* SF_canvas = new TCanvas();
+  gStyle->SetOptStat(0);
+  SF->Draw("E");
+  SF_canvas->SaveAs("plots/ScaleFactor.pdf");
+
+  //efficiency plot
   auto legend = new TLegend(0.9,0.9,1.0,1.0);
   auto mg  = new TMultiGraph();
   Eff_MC->SetLineColor(kRed);
@@ -117,4 +131,13 @@ void TnPAnalyzer()
   legend->AddEntry(graph_MC,"MC");
   legend->Draw();
   oi->SaveAs("plots/Efficiency.pdf");
+
+  //Save eff object to root file
+  TFile* eff = TFile::Open("efficiency.root","RECREATE");
+  eff->WriteObject(Eff_MC, "Eff_MC");
+  eff->WriteObject(Eff_DATA, "Eff_DATA");
+
+  //Read Tefficiency object from root file
+  TEfficiency* tmp = (TEfficiency*)eff->Get("Eff_MC");
+  std::cout<<tmp->GetEfficiency(1)<<std::endl;
 }
