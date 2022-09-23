@@ -6,15 +6,15 @@
 void CreateTnPpairsData()
 {
   int j,TagIndex,ProbeIndex;
-  float TagPt,ProbePt,Diele_mass,TagEta,ProbeEta;
+  float TagPt,ProbePt,Diele_mass,TagEta,ProbeEta,dR;
   bool ProbePass;
-  std::vector<float> *ele_pt=0, *ele_eta=0, *ElectronMVAEstimatorRun2Fall17NoIsoV2Values=0, *ElectronMVAEstimatorRun2Fall17IsoV2Values=0;
+  std::vector<float> *ele_pt=0, *ele_eta=0,*ele_phi=0, *ElectronMVAEstimatorRun2Fall17NoIsoV2Values=0, *ElectronMVAEstimatorRun2Fall17IsoV2Values=0;
   std::vector<bool> *mvaEleID_Fall17_noIso_V2_wp90=0, *mvaEleID_Fall17_noIso_V2_wp80=0, *mvaEleID_Fall17_noIso_V2_wpLoose_unsopported=0,
   *mvaEleID_Fall17_iso_V2_wpHZZ_unsopported=0;
 
   srand (time(NULL));
 
-  TFile* file = TFile::Open("Bpark_DATA_v2.root");
+  TFile* file = TFile::Open("Bpark_DATA_18_ReReco.root");
   TTree* originalTree = (TTree*)file->Get("electrons/Events");
   originalTree->SetBranchStatus("*",0);
   originalTree->SetBranchStatus("Diele_mass",1);
@@ -26,6 +26,8 @@ void CreateTnPpairsData()
   originalTree->SetBranchStatus("ele_eta",1);
   originalTree->SetBranchStatus("ElectronMVAEstimatorRun2Fall17NoIsoV2Values",1);
   originalTree->SetBranchStatus("ElectronMVAEstimatorRun2Fall17IsoV2Values",1);
+  originalTree->SetBranchStatus("ele_phi",1);
+  originalTree->SetBranchStatus("dR",1);
   TFile* output = TFile::Open("TnPpairs_DATA.root","RECREATE");
 
   TTree* selectedTree = originalTree->CopyTree("(ElectronMVAEstimatorRun2Fall17NoIsoV2Values[0]>0.95 && ele_pt[0]>7 && (fabs(ele_eta[0])<1.44 || fabs(ele_eta[0])>1.57)) || (ElectronMVAEstimatorRun2Fall17NoIsoV2Values[1]>0.95 && ele_pt[1]>7 && (fabs(ele_eta[1])<1.44 || fabs(ele_eta[1])>1.57))");
@@ -38,6 +40,8 @@ void CreateTnPpairsData()
   selectedTree->SetBranchAddress("ele_eta",&ele_eta);
   selectedTree->SetBranchAddress("ElectronMVAEstimatorRun2Fall17NoIsoV2Values",&ElectronMVAEstimatorRun2Fall17NoIsoV2Values);
   selectedTree->SetBranchAddress("ElectronMVAEstimatorRun2Fall17IsoV2Values",&ElectronMVAEstimatorRun2Fall17IsoV2Values);
+  selectedTree->SetBranchAddress("ele_phi",&ele_phi);
+  selectedTree->SetBranchAddress("dR",&dR);
   TBranch *BranchTagPt=selectedTree->Branch("TagPt",&TagPt);
   TBranch *BranchProbePt=selectedTree->Branch("ProbePt",&ProbePt);
   TBranch *BranchTagEta=selectedTree->Branch("TagEta",&TagEta);
