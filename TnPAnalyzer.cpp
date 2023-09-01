@@ -6,16 +6,19 @@
 #include "MakeFitData.cpp"
 #include "MakeFitMC.cpp"
 #include "Efficiency.cpp"
+#include <fstream>
+#include <cmath>
+#include <iomanip>
+using std::setw;
 
 void TnPAnalyzer()
 {
   int i;
   std::vector<std::pair<float,float>> YieldErrorDataPass, YieldErrorDataFail, YieldErrorMCPass, YieldErrorMCFail;
   float bins[]={5,7,10,15};  //this part is configurable, select bins for fitting
-  bool FitInnerBarrel=1, FitOuterBarrel=0, FitEndcap=0; //this part is configurable, fit for barrel or endcap
+  bool FitInnerBarrel=0, FitOuterBarrel=0, FitEndcap=1; //this part is configurable, fit for barrel or endcap
   int NumberOfBins=sizeof(bins)/sizeof(bins[0])-1;
   TString InnerBarrelCut="fabs(ProbeEta)<0.8";
-  //TString InnerBarrelCut="fabs(ProbeEta)>1 && fabs(ProbeEta)<1.5";
   TString OuterBarrelCut="fabs(ProbeEta)>0.8 && fabs(ProbeEta)<1.44";
   TString EndcapCut="fabs(ProbeEta)>1.57 && fabs(ProbeEta)<2.5";
   TFile *file_data = TFile::Open("TnPpairs_DATA.root");
@@ -80,22 +83,27 @@ void TnPAnalyzer()
     YieldErrorMCFail.push_back(MakeFitMC(FaillingProbesMC[i], 1, "plots/FaillingProbesMC_"+std::to_string((int)bins[i])+"_"+std::to_string((int)bins[i+1])+".pdf"));
   }
 
-  //Efficiency(YieldErrorDataPass,YieldErrorDataFail,YieldErrorMCPass, YieldErrorMCFail, bins, NumberOfBins);
-
-  //std::cout<<Efficiency(YieldErrorMCPass, YieldErrorMCFail, bins, NumberOfBins)->GetEfficiency(2)<<std::endl;
-
   TEfficiency* Eff_MC = Efficiency(YieldErrorMCPass, YieldErrorMCFail, bins, NumberOfBins);
   TEfficiency* Eff_DATA = Efficiency(YieldErrorDataPass, YieldErrorDataFail, bins, NumberOfBins);
-  for(i=1;i<=3;i++)
+
+  //scale factors
+  TH1F* SF = new TH1F("scale factor", "scale factor",NumberOfBins, bins);
+  double SF_error_up[NumberOfBins], SF_error_dn[NumberOfBins];
+  for(i=1;i<=NumberOfBins;i++)
   {
-    std::cout<<Eff_MC->GetEfficiency(i)<<" "<<Eff_MC->GetEfficiencyErrorLow(i)<<" "<<Eff_MC->GetEfficiencyErrorUp(i)<<std::endl;
+    SF->SetBinContent(i,Eff_DATA->GetEfficiency(i)*1.0/Eff_MC->GetEfficiency(i));
+    SF_error_up[i]=sqrt(pow(Eff_MC->GetEfficiency(i)*Eff_DATA->GetEfficiencyErrorUp(i),2)+pow(Eff_DATA->GetEfficiency(i)*Eff_MC->GetEfficiencyErrorUp(i),2))/pow(Eff_MC->GetEfficiency(i),2);
+    SF_error_dn[i]=sqrt(pow(Eff_MC->GetEfficiency(i)*Eff_DATA->GetEfficiencyErrorLow(i),2)+pow(Eff_DATA->GetEfficiency(i)*Eff_MC->GetEfficiencyErrorLow(i),2))/pow(Eff_MC->GetEfficiency(i),2);
+    SF->SetBinError(i, SF_error_up[i]); //error up and down are practically equal so I put symmetric error equal to error up
   }
-  for(i=1;i<=3;i++)
-  {
-    std::cout<<Eff_DATA->GetEfficiency(i)<<" "<<Eff_DATA->GetEfficiencyErrorLow(i)<<" "<<Eff_DATA->GetEfficiencyErrorUp(i)<<std::endl;
-  }
-  std::cout<<YieldErrorMCPass.at(0).first<<" "<<YieldErrorMCPass.at(0).second<<std::endl;
-  std::cout<<YieldErrorMCFail.at(0).first<<" "<<YieldErrorMCFail.at(0).second<<std::endl;
+  SF->GetXaxis()->SetTitle("pT/GeV");
+  SF->GetYaxis()->SetTitle("SF");
+  TCanvas* SF_canvas = new TCanvas();
+  gStyle->SetOptStat(0);
+  SF->Draw("E");
+  SF_canvas->SaveAs("plots/ScaleFactor.pdf");
+
+  //efficiency plot
   auto legend = new TLegend(0.9,0.9,1.0,1.0);
   auto mg  = new TMultiGraph();
   Eff_MC->SetLineColor(kRed);
@@ -117,4 +125,29 @@ void TnPAnalyzer()
   legend->AddEntry(graph_MC,"MC");
   legend->Draw();
   oi->SaveAs("plots/Efficiency.pdf");
+
+  //Save eff object to root file
+  TFile* eff = TFile::Open("efficiency.root","RECREATE");
+  eff->WriteObject(Eff_MC, "Eff_MC");
+  eff->WriteObject(Eff_DATA, "Eff_DATA");
+
+  //Write into txt file
+  ofstream SFfile;
+  SFfile.open ("SF.txt");
+  SFfile <<std::left<<std::setw(9)<< "pT"<<std::setw(13)<<"SF"<<std::setw(13)<<"SF_err_up"<<"SF_err_dn"<<std::endl;
+  for(i=1;i<=NumberOfBins;i++)
+  SFfile<<std::setw(2)<<bins[i-1]<<"-"<<std::setw(6)<<bins[i]<<std::setw(10)<<SF->GetBinContent(i)<<"   "<<std::setw(13)<<SF_error_up[i]<<std::setw(10)<<SF_error_dn[i]<<std::endl;
+
+  ofstream MCeff;
+  MCeff.open ("eff_MC.txt");
+  MCeff <<std::left<<std::setw(9)<< "pT"<<std::setw(13)<<"eff"<<std::setw(13)<<"eff_err_up"<<"eff_error_dn"<<std::endl;
+  for(i=1;i<=NumberOfBins;i++)
+  MCeff<<std::setw(2)<<bins[i-1]<<"-"<<std::setw(6)<<bins[i]<<std::setw(10)<<Eff_MC->GetEfficiency(i)<<"   "<<std::setw(13)<<Eff_MC->GetEfficiencyErrorUp(i)<<std::setw(10)<<Eff_MC->GetEfficiencyErrorLow(i)<<std::endl;
+
+  ofstream DATAeff;
+  DATAeff.open ("eff_DATA.txt");
+  DATAeff <<std::left<<std::setw(9)<< "pT"<<std::setw(13)<<"eff"<<std::setw(13)<<"eff_err_up"<<"eff_error_dn"<<std::endl;
+  for(i=1;i<=NumberOfBins;i++)
+  DATAeff<<std::setw(2)<<bins[i-1]<<"-"<<std::setw(6)<<bins[i]<<std::setw(10)<<Eff_DATA->GetEfficiency(i)<<"   "<<std::setw(13)<<Eff_DATA->GetEfficiencyErrorUp(i)<<std::setw(10)<<Eff_DATA->GetEfficiencyErrorLow(i)<<std::endl;
+
 }

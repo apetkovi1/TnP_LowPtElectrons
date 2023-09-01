@@ -17,6 +17,7 @@ std::pair<float, float> MakeFitData(TTree* tree, bool DoPlot, std::string FigNam
   RooArgSet ntupleVarSet(Diele_mass);
   RooDataSet DataSet("data", "data set", tree, ntupleVarSet);
 
+<<<<<<< HEAD
   RooRealVar* dcbMean  = new RooRealVar("dcbMean","dcbMean",3.1, 3.05,3.16);
   //RooRealVar* dcbMean  = new RooRealVar("dcbMean","dcbMean",3.096916, 3.096916,3.096916);
   RooRealVar* dcbSigma = new RooRealVar("dcbSigma","dcbSigma",0.16, 0.05, 0.30); // 0.05
@@ -29,6 +30,21 @@ std::pair<float, float> MakeFitData(TTree* tree, bool DoPlot, std::string FigNam
 
   RooRealVar a0("a0", "a0", -0.5, -2, 2);// bija -10 lidz 10 abos
   RooRealVar a1("a1", "a1", -0.03, -0.4, 0.5);
+=======
+  RooRealVar* dcbMean  = new RooRealVar("dcbMean","dcbMean",3.1, 3.0,3.15);
+  RooRealVar* dcbSigma = new RooRealVar("dcbSigma","dcbSigma",0.05, 0, 1.);
+  RooRealVar* dcbAlphaL = new RooRealVar("dcbAlphaL","dcbAlphaL",0.57, 0, 10.);
+  RooRealVar* dcbNL = new RooRealVar("dcbNL","dcbNL",30., 20., 50.);
+  RooRealVar* dcbAlphaR = new RooRealVar("dcbAlphaR","dcbAlphaR",1.1, 0, 10.);
+  RooRealVar* dcbNR = new RooRealVar("dcbNR","dcbNR",30., 20., 50.);
+  dcbMean->setVal(3.096916); // Fix JPsi mass
+  dcbMean->setConstant(kTRUE); //Fix Jpsi mass
+  RooCrystalBall* dcb = new RooCrystalBall("dcb","dcb",Diele_mass,*dcbMean,*dcbSigma, *dcbAlphaL, *dcbNL, *dcbAlphaR, *dcbNR);
+  RooRealVar sig_yield("sig_yield", "yield of signal peak", 770, 0, 1000000);
+
+  RooRealVar a0("a0", "a0", 0, -100, 100);
+  RooRealVar a1("a1", "a1", 0, -10, 10);
+>>>>>>> 2fcaaee57ed361f7241ceabe0924a7718b83ce37
   RooChebychev bkg_poly("background","background", Diele_mass, RooArgList(a0,a1));
   RooRealVar bkg_yield("bkg_yield", "yield of background", 50000, 0, 10000000);
 
