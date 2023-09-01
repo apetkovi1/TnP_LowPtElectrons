@@ -18,11 +18,11 @@ std::pair<float, float> MakeFitMC(TTree* tree, bool DoPlot, std::string FigName)
   RooDataSet DataSet("data", "data set", tree, ntupleVarSet);
 
   RooRealVar* dcbMean  = new RooRealVar("dcbMean","dcbMean",3.1, 3.0,3.15);
-  RooRealVar* dcbSigma = new RooRealVar("dcbSigma","dcbSigma",0.05, 0, 1.);
-  RooRealVar* dcbAlphaL = new RooRealVar("dcbAlphaL","dcbAlphaL",0.57, 0, 10.);
-  RooRealVar* dcbNL = new RooRealVar("dcbNL","dcbNL",2.8, 0, 10.);
-  RooRealVar* dcbAlphaR = new RooRealVar("dcbAlphaR","dcbAlphaR",1.1, 0, 10.);
-  RooRealVar* dcbNR = new RooRealVar("dcbNR","dcbNR",1.7, 0, 10.);
+  RooRealVar* dcbSigma = new RooRealVar("dcbSigma","dcbSigma",0.085, 0.053, 1.);
+  RooRealVar* dcbAlphaL = new RooRealVar("dcbAlphaL","dcbAlphaL",2.57, 0.2, 10.);
+  RooRealVar* dcbNL = new RooRealVar("dcbNL","dcbNL",2.8, 0, 60.);
+  RooRealVar* dcbAlphaR = new RooRealVar("dcbAlphaR","dcbAlphaR",3.1, 0.2, 10.);
+  RooRealVar* dcbNR = new RooRealVar("dcbNR","dcbNR",1.7, 0, 60.);
   RooCrystalBall* dcb = new RooCrystalBall("dcb","dcb",Diele_mass,*dcbMean,*dcbSigma, *dcbAlphaL, *dcbNL, *dcbAlphaR, *dcbNR);
   RooRealVar sig_yield("sig_yield", "yield of signal peak", 1000, 0, 1000000);
 

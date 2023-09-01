@@ -16,12 +16,13 @@ mkdir plots
 ```
 git clone https://github.com/apetkovi1/TnP_LowPtElectrons.git
 ```
-* Cretate TnP pairs:
+* Cretate TnP pairs from a ntuple (possible to modify the included branches, the pair selection cuts and the ID of interest for efficiency calculation):
 ```
 root -q -b CreateTnPpairsData.cpp "()"
 root -q -b CreateTnPpairsMC.cpp "()"
 ```
-* Perform fits and get the efficiencies (figures will be stored in plots directory). Bins and CMS part (Barrel or Endcap) can be selected inside TnPAnalyzer.cpp
+* Perform fits and get the efficiencies (figures will be stored in plots directory). pT and rel_Iso bins can be defined inside TnPAnalyzer_*.cpp files. A corresponding TnPanalyzer file is present for noIso and Iso ID efficiency calculations.
 ```
-root -q -b TnPAnalyzer.cpp "()"
+root -q -b TnPAnalyzer_noIsoID.cpp "()"
+root -q -b TnPAnalyzer_isoID.cpp "()"
 ```
