@@ -5,19 +5,12 @@
 
 void CreateTnPpairsMC()
 {
-<<<<<<< HEAD
   // Define parameters and branches used (Multiple lines needs to added, check the already defined branches and define new in the same manner) (Example "ele_pt" and corresponding TagPt/ProbePt branches/parameters)
   // If some of the defined branches here are not included in ntuples, comment them out of this code
   int j,TagIndex,ProbeIndex,ele_sameVertex,ele_ip3D_match;
   float TagPt,ProbePt,Diele_mass,Diele_pt,TagEta,ProbeEta,TagPhi,ProbePhi,dR,TagRelISO,ProbeRelISO,ProbeChIso,ProbeNeuIso,ProbePhoIso,TagDxy,ProbeDxy,TagDxyError,ProbeDxyError,TagDz,ProbeDz,TagDzError,ProbeDzError,TagMVA;
   bool ProbePass;
   std::vector<float> *ele_pt=0, *ele_eta=0, *ele_dxy=0, *ele_dz=0, *ele_dxyError=0, *ele_dzError=0, *ele_phi=0, *ele_pfPhotonIso=0 , *ele_pfChargedHadIso=0 , *ele_pfNeutralHadIso=0 , *ElectronMVAEstimatorRun2Fall17NoIsoV2Values=0, *ElectronMVAEstimatorRun2Fall17IsoV2Values=0,*relISO_a_corr=0;
-=======
-  int j,TagIndex,ProbeIndex;
-  float TagPt,ProbePt,Diele_mass,TagEta,ProbeEta, dR;
-  bool ProbePass;
-  std::vector<float> *ele_pt=0, *ele_eta=0,*ele_phi=0, *ElectronMVAEstimatorRun2Fall17NoIsoV2Values=0, *ElectronMVAEstimatorRun2Fall17IsoV2Values=0;
->>>>>>> 2fcaaee57ed361f7241ceabe0924a7718b83ce37
   std::vector<bool> *mvaEleID_Fall17_noIso_V2_wp90=0, *mvaEleID_Fall17_noIso_V2_wp80=0, *mvaEleID_Fall17_noIso_V2_wpLoose_unsopported=0,
   *mvaEleID_Fall17_iso_V2_wpHZZ_unsopported=0,*mvaEleID_Fall17_iso_V2_wp80=0,*mvaEleID_Fall17_iso_V2_wp90=0;
   std::vector<int> *ele_mother=0;
@@ -25,7 +18,8 @@ void CreateTnPpairsMC()
   srand (time(NULL));
 
 
-  TFile* file = TFile::Open("/eos/user/n/nstrautn/Bparking_DATA/Bpark_22_SM_test_MC.root"); // Change input MC ntuple file here (Ntuple should come from the related miniAOD Ntuplizer)
+  //TFile* file = TFile::Open("/eos/user/n/nstrautn/Bparking_DATA/Bpark_22_SM_test_MC.root"); // Change input MC ntuple file here (Ntuple should come from the related miniAOD Ntuplizer)
+  TFile* file = TFile::Open("/eos/user/n/nstrautn/Bparking_DATA/Bpark_MC_iso_vtxMatch.root");
   TTree* originalTree = (TTree*)file->Get("electrons/Events");
   originalTree->SetBranchStatus("*",0);
   originalTree->SetBranchStatus("Diele_mass",1);
@@ -53,8 +47,6 @@ void CreateTnPpairsMC()
   originalTree->SetBranchStatus("ElectronMVAEstimatorRun2Fall17NoIsoV2Values",1);
   originalTree->SetBranchStatus("ElectronMVAEstimatorRun2Fall17IsoV2Values",1);
   originalTree->SetBranchStatus("ele_mother",1);
-  originalTree->SetBranchStatus("ele_phi",1);
-  originalTree->SetBranchStatus("dR",1);
   TFile* output = TFile::Open("TnPpairs_MC.root","RECREATE");
 
   // Define tag and probe tag cuts and pair selection (Check all places where this cut is written. Change needed in 4 lines) 1/4
@@ -84,8 +76,7 @@ void CreateTnPpairsMC()
   selectedTree->SetBranchAddress("ElectronMVAEstimatorRun2Fall17NoIsoV2Values",&ElectronMVAEstimatorRun2Fall17NoIsoV2Values);
   selectedTree->SetBranchAddress("ElectronMVAEstimatorRun2Fall17IsoV2Values",&ElectronMVAEstimatorRun2Fall17IsoV2Values);
   selectedTree->SetBranchAddress("ele_mother",&ele_mother);
-  selectedTree->SetBranchAddress("ele_phi",&ele_phi);
-  selectedTree->SetBranchAddress("dR",&dR);
+  
   TBranch *BranchTagPt=selectedTree->Branch("TagPt",&TagPt);
   TBranch *BranchProbePt=selectedTree->Branch("ProbePt",&ProbePt);
   TBranch *BranchTagDxy=selectedTree->Branch("TagDxy",&TagDxy);
@@ -151,8 +142,8 @@ void CreateTnPpairsMC()
 
     //if(mvaEleID_Fall17_noIso_V2_wp80->at(ProbeIndex)==1)
     //if(mvaEleID_Fall17_iso_V2_wp80->at(ProbeIndex)==1)
-    //if(mvaEleID_Fall17_iso_V2_wpHZZ_unsopported->at(ProbeIndex)==1)
-    if(mvaEleID_Fall17_noIso_V2_wpLoose_unsopported->at(ProbeIndex)==1) //ID to measure efficiency
+    if(mvaEleID_Fall17_iso_V2_wpHZZ_unsopported->at(ProbeIndex)==1)
+    //if(mvaEleID_Fall17_noIso_V2_wpLoose_unsopported->at(ProbeIndex)==1) //ID to measure efficiency
 
     ProbePass=1;
     else
@@ -263,8 +254,8 @@ void CreateTnPpairsMC()
 
     //if(mvaEleID_Fall17_noIso_V2_wp80->at(ProbeIndex)==1)
     //if(mvaEleID_Fall17_iso_V2_wp80->at(ProbeIndex)==1)
-    //if(mvaEleID_Fall17_iso_V2_wpHZZ_unsopported->at(ProbeIndex)==1)
-    if(mvaEleID_Fall17_noIso_V2_wpLoose_unsopported->at(ProbeIndex)==1) //ID to measure efficiency
+    if(mvaEleID_Fall17_iso_V2_wpHZZ_unsopported->at(ProbeIndex)==1)
+    //if(mvaEleID_Fall17_noIso_V2_wpLoose_unsopported->at(ProbeIndex)==1) //ID to measure efficiency
 
     ProbePass=1;
     else
