@@ -5,16 +5,16 @@
 
 void CreateTnPpairsData() 
 {
-  int j,TagIndex,ProbeIndex;
-  float TagPt,ProbePt,Diele_mass,TagEta,ProbeEta,dR;
+  int j,TagIndex,ProbeIndex,ele_sameVertex,ele_ip3D_match;
+  float TagPt,ProbePt,Diele_mass,Diele_pt,TagEta,ProbeEta,TagPhi,ProbePhi,dR,TagRelISO,ProbeRelISO,ProbeChIso,ProbeNeuIso,ProbePhoIso,TagDxy,ProbeDxy,TagDxyError,ProbeDxyError,TagDz,ProbeDz,TagDzError,ProbeDzError,TagMVA;
   bool ProbePass;
-  std::vector<float> *ele_pt=0, *ele_eta=0,*ele_phi=0, *ElectronMVAEstimatorRun2Fall17NoIsoV2Values=0, *ElectronMVAEstimatorRun2Fall17IsoV2Values=0;
+  std::vector<float> *ele_pt=0, *ele_eta=0, *ele_dxy=0, *ele_dz=0, *ele_dxyError=0, *ele_dzError=0, *ele_phi=0, *ele_pfPhotonIso=0 , *ele_pfChargedHadIso=0 , *ele_pfNeutralHadIso=0 , *ElectronMVAEstimatorRun2Fall17NoIsoV2Values=0, *ElectronMVAEstimatorRun2Fall17IsoV2Values=0,*relISO_a_corr=0;
   std::vector<bool> *mvaEleID_Fall17_noIso_V2_wp90=0, *mvaEleID_Fall17_noIso_V2_wp80=0, *mvaEleID_Fall17_noIso_V2_wpLoose_unsopported=0,
   *mvaEleID_Fall17_iso_V2_wpHZZ_unsopported=0,*mvaEleID_Fall17_iso_V2_wp80=0,*mvaEleID_Fall17_iso_V2_wp90=0;
 
   srand (time(NULL));
 
-  TFile* file = TFile::Open("Bpark_DATA_18_ReReco.root");
+  TFile* file = TFile::Open("/eos/user/n/nstrautn/Bparking_DATA/Bpark_data6_iso_track_3.root");
   TTree* originalTree = (TTree*)file->Get("electrons/Events");
   originalTree->SetBranchStatus("*",0);
   originalTree->SetBranchStatus("Diele_mass",1);
@@ -22,8 +22,8 @@ void CreateTnPpairsData()
   originalTree->SetBranchStatus("dR",1);
   originalTree->SetBranchStatus("relISO_a_corr",1);
   originalTree->SetBranchStatus("ele_pt",1);
-  originalTree->SetBranchStatus("ele_sameVertex",1);
-  originalTree->SetBranchStatus("ele_ip3D_match",1);
+  //originalTree->SetBranchStatus("ele_sameVertex",1);
+  //originalTree->SetBranchStatus("ele_ip3D_match",1);
   originalTree->SetBranchStatus("ele_dxy",1);
   originalTree->SetBranchStatus("ele_dxyError",1);
   originalTree->SetBranchStatus("ele_dz",1);
@@ -41,8 +41,6 @@ void CreateTnPpairsData()
   originalTree->SetBranchStatus("ele_eta",1);
   originalTree->SetBranchStatus("ElectronMVAEstimatorRun2Fall17NoIsoV2Values",1);
   originalTree->SetBranchStatus("ElectronMVAEstimatorRun2Fall17IsoV2Values",1);
-  originalTree->SetBranchStatus("ele_phi",1);
-  originalTree->SetBranchStatus("dR",1);
   TFile* output = TFile::Open("TnPpairs_DATA.root","RECREATE");
 
   // Define tag and probe tag cuts and pair selection (Check all places where this cut is written. Change needed in 4 lines) 1/4
@@ -53,8 +51,8 @@ void CreateTnPpairsData()
   selectedTree->SetBranchAddress("dR",&dR);
   selectedTree->SetBranchAddress("relISO_a_corr",&relISO_a_corr);
   selectedTree->SetBranchAddress("ele_pt",&ele_pt);
-  selectedTree->SetBranchAddress("ele_sameVertex",&ele_sameVertex);
-  selectedTree->SetBranchAddress("ele_ip3D_match",&ele_ip3D_match);
+  //selectedTree->SetBranchAddress("ele_sameVertex",&ele_sameVertex);
+  //selectedTree->SetBranchAddress("ele_ip3D_match",&ele_ip3D_match);
   selectedTree->SetBranchAddress("ele_dxy",&ele_dxy);
   selectedTree->SetBranchAddress("ele_dxyError",&ele_dxyError);
   selectedTree->SetBranchAddress("ele_dz",&ele_dz);
@@ -72,8 +70,7 @@ void CreateTnPpairsData()
   selectedTree->SetBranchAddress("ele_eta",&ele_eta);
   selectedTree->SetBranchAddress("ElectronMVAEstimatorRun2Fall17NoIsoV2Values",&ElectronMVAEstimatorRun2Fall17NoIsoV2Values);
   selectedTree->SetBranchAddress("ElectronMVAEstimatorRun2Fall17IsoV2Values",&ElectronMVAEstimatorRun2Fall17IsoV2Values);
-  selectedTree->SetBranchAddress("ele_phi",&ele_phi);
-  selectedTree->SetBranchAddress("dR",&dR);
+  
   TBranch *BranchTagPt=selectedTree->Branch("TagPt",&TagPt);
   TBranch *BranchProbePt=selectedTree->Branch("ProbePt",&ProbePt);
   TBranch *BranchTagDxy=selectedTree->Branch("TagDxy",&TagDxy);
@@ -137,8 +134,8 @@ void CreateTnPpairsData()
 
     //if(mvaEleID_Fall17_noIso_V2_wp80->at(ProbeIndex)==1)
     //if(mvaEleID_Fall17_iso_V2_wp80->at(ProbeIndex)==1)
-    if(mvaEleID_Fall17_noIso_V2_wpLoose_unsopported->at(ProbeIndex)==1)
-    //if(mvaEleID_Fall17_iso_V2_wpHZZ_unsopported->at(ProbeIndex)==1) //ID to measure efficiency
+    //if(mvaEleID_Fall17_noIso_V2_wpLoose_unsopported->at(ProbeIndex)==1)
+    if(mvaEleID_Fall17_iso_V2_wpHZZ_unsopported->at(ProbeIndex)==1) //ID to measure efficiency
 
     ProbePass=1;
     else
@@ -174,8 +171,8 @@ void CreateTnPpairsData()
   TempTree->SetBranchAddress("dR",&dR);
   TempTree->SetBranchAddress("relISO_a_corr",&relISO_a_corr);
   TempTree->SetBranchAddress("ele_pt",&ele_pt);
-  TempTree->SetBranchAddress("ele_sameVertex",&ele_sameVertex);
-  TempTree->SetBranchAddress("ele_ip3D_match",&ele_ip3D_match);
+  //TempTree->SetBranchAddress("ele_sameVertex",&ele_sameVertex);
+  //TempTree->SetBranchAddress("ele_ip3D_match",&ele_ip3D_match);
   TempTree->SetBranchAddress("ele_dxy",&ele_dxy);
   TempTree->SetBranchAddress("ele_dxyError",&ele_dxyError);
   TempTree->SetBranchAddress("ele_dz",&ele_dz);
