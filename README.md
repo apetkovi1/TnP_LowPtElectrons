@@ -11,6 +11,8 @@ cmsenv
 mkdir TnP_fits
 cd TnP_fits
 mkdir plots
+mkdir plots/noIso_ID
+mkdir plots/Iso_ID
 ```
 * Get the TnP tool:
 ```
