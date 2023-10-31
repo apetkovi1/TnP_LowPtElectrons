@@ -24,7 +24,7 @@ void TnPAnalyzer_isoID()
   int i;
   float ptBins[]={5,7,10,15};  //this part is configurable, select bins for fitting
   string tag_cut_status="tagNoIso"; //decoration for png names
-  string folderName="iso_HZZ"; //ID Choice;
+  string folderName="Iso_ID"; //Result directory name;
   bool save_status=1;
   bool doEfficiency=1;
   int variations = 4;
